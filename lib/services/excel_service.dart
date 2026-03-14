@@ -85,7 +85,8 @@ class ExcelService {
         TextCellValue(item.productCode),
         TextCellValue(item.designation),
         TextCellValue(item.barcode),
-        IntCellValue(item.quantity),
+        IntCellValue(item.quantity.toInt()),
+        DoubleCellValue(item.quantity),
         TextCellValue(item.date.toIso8601String())
       ]);
     }
