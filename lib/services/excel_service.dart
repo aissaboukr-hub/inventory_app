@@ -6,7 +6,6 @@ import '../models/product.dart';
 import '../models/inventory_item.dart';
 
 class ExcelService {
-  // Importation via Isolates (compute)
   static Future<List<Product>> importProducts(String filePath) async {
     return await compute(_parseExcelFile, filePath);
   }
@@ -20,7 +19,6 @@ class ExcelService {
       var rows = excel.tables[table]?.rows;
       if (rows == null || rows.isEmpty) continue;
 
-      // Détection des colonnes
       int? codeIdx, desIdx, barIdx;
       var header = rows.first;
       for (int i = 0; i < header.length; i++) {
@@ -54,7 +52,6 @@ class ExcelService {
     return products;
   }
 
-  // Exportation vers Excel avec 2 feuilles
   static Future<String> exportInventory({
     required String inventoryName,
     required List<InventoryItem> history,
@@ -70,7 +67,6 @@ class ExcelService {
   static Future<String> _generateExcelFile(Map<String, dynamic> data) async {
     var excel = Excel.createExcel();
     
-    // Feuille 1 : Historique
     Sheet sheet1 = excel['Historique'];
     sheet1.appendRow([
       TextCellValue('Code'), 
@@ -85,13 +81,11 @@ class ExcelService {
         TextCellValue(item.productCode),
         TextCellValue(item.designation),
         TextCellValue(item.barcode),
-        IntCellValue(item.quantity.toInt()),
-        DoubleCellValue(item.quantity),
+        IntCellValue(item.quantity.toInt()), // Correction: Conversion forcée en int
         TextCellValue(item.date.toIso8601String())
       ]);
     }
 
-    // Feuille 2 : Totaux
     Sheet sheet2 = excel['Totaux'];
     sheet2.appendRow([
       TextCellValue('Code'), 
@@ -105,7 +99,6 @@ class ExcelService {
         TextCellValue(row['product_code']?.toString() ?? ''),
         TextCellValue(row['designation']?.toString() ?? ''),
         TextCellValue(row['barcode']?.toString() ?? ''),
-        // On gère le cas où la quantité pourrait être double ou int
         IntCellValue(int.tryParse(row['total_quantity'].toString()) ?? 0)
       ]);
     }

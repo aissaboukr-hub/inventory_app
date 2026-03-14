@@ -22,28 +22,26 @@ class _ScannerScreenState extends State<ScannerScreen> {
       appBar: AppBar(
         title: const Text('Scanner Barcode'),
         actions: [
-          // Correction Switch Camera
           ValueListenableBuilder(
             valueListenable: controller,
             builder: (context, state, child) {
+              final torchState = state.torchState;
               return IconButton(
                 icon: Icon(
-                  // On utilise state.cameraDirection au lieu de state.facing
-                  state.cameraDirection == CameraFacing.front
-                      ? Icons.camera_front
-                      : Icons.camera_rear,
+                  torchState == TorchState.on ? Icons.flash_on : Icons.flash_off,
+                  color: torchState == TorchState.on ? Colors.yellow : Colors.grey,
                 ),
-                onPressed: () => controller.switchCamera(),
+                onPressed: () => controller.toggleTorch(),
               );
             },
           ),
-          // Correction Switch Camera
           ValueListenableBuilder(
             valueListenable: controller,
             builder: (context, state, child) {
+              // Correction: Utilisation de cameraDirection au lieu de facing
               return IconButton(
                 icon: Icon(
-                  state.facing == CameraFacing.front
+                  state.cameraDirection == CameraFacing.front
                       ? Icons.camera_front
                       : Icons.camera_rear,
                 ),
