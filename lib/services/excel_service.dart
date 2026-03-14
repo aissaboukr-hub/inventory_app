@@ -74,26 +74,26 @@ class ExcelService {
     
     // Feuille 1 : Historique
     Sheet sheet1 = excel['Historique'];
-    sheet1.appendRow(['Code', 'Designation', 'Barcode', 'Quantite', 'Date']);
+    sheet1.appendRow([CellValue.string('Code'), CellValue.string('Designation'), CellValue.string('Barcode'), CellValue.string('Quantite'), CellValue.string('Date')]);
     for (var item in data['history'] as List<InventoryItem>) {
       sheet1.appendRow([
-        item.productCode,
-        item.designation,
-        item.barcode,
-        item.quantity,
-        item.date.toIso8601String()
+        CellValue.string(item.productCode),
+        CellValue.string(item.designation),
+        CellValue.string(item.barcode),
+        CellValue.number(item.quantity),
+        CellValue.string(item.date.toIso8601String())
       ]);
     }
 
     // Feuille 2 : Totaux
     Sheet sheet2 = excel['Totaux'];
-    sheet2.appendRow(['Code', 'Designation', 'Barcode', 'Quantite Totale']);
+    sheet2.appendRow([CellValue.string('Code'), CellValue.string('Designation'), CellValue.string('Barcode'), CellValue.string('Quantite Totale')]);
     for (var row in data['totals'] as List<Map<String, dynamic>>) {
       sheet2.appendRow([
-        row['product_code'],
-        row['designation'],
-        row['barcode'],
-        row['total_quantity']
+        CellValue.string(row['product_code']),
+        CellValue.string(row['designation']),
+        CellValue.string(row['barcode']),
+        CellValue.number(row['total_quantity'])
       ]);
     }
 
