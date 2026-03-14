@@ -26,11 +26,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
             icon: ValueListenableBuilder(
               valueListenable: controller.torchState,
               builder: (context, state, child) {
+                if (state == null) {
+                  return const Icon(Icons.flash_off, color: Colors.grey); // Default icon when state is null
+                }
                 switch (state) {
                   case TorchState.off:
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
+                  default:
+                    return const Icon(Icons.flash_off, color: Colors.grey); // Default icon for undefined state
                 }
               },
             ),
@@ -40,11 +45,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
             icon: ValueListenableBuilder(
               valueListenable: controller.cameraFacingState,
               builder: (context, state, child) {
+                if (state == null) {
+                  return const Icon(Icons.camera_rear); // Default icon when state is null
+                }
                 switch (state) {
                   case CameraFacing.front:
                     return const Icon(Icons.camera_front);
                   case CameraFacing.back:
                     return const Icon(Icons.camera_rear);
+                  default:
+                    return const Icon(Icons.camera_rear); // Default icon for undefined state
                 }
               },
             ),
