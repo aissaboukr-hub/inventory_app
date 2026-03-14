@@ -42,23 +42,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
             onPressed: () => controller.toggleTorch(),
           ),
           IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
-              builder: (context, state, child) {
-                if (state == null) {
-                  return const Icon(Icons.camera_rear); // Default icon when state is null
-                }
-                switch (state) {
-                  case CameraFacing.front:
-                    return const Icon(Icons.camera_front);
-                  case CameraFacing.back:
-                    return const Icon(Icons.camera_rear);
-                  default:
-                    return const Icon(Icons.camera_rear); // Default icon for undefined state
-                }
-              },
+            icon: Icon(
+              // Updated approach without cameraFacingState
+              controller.cameraFacing == CameraFacing.front
+                  ? Icons.camera_front
+                  : Icons.camera_rear,
             ),
-            onPressed: () => controller.switchCamera(),
+            onPressed: () => controller.switchCamera(), // Switch camera using controller
           ),
         ],
       ),
