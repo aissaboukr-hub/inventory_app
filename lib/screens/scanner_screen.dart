@@ -22,26 +22,33 @@ class _ScannerScreenState extends State<ScannerScreen> {
       appBar: AppBar(
         title: const Text('Scanner Barcode'),
         actions: [
-          IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: controller.torchState,
-              builder: (context, state, child) {
-                if (state == TorchState.off) {
-                  return const Icon(Icons.flash_off, color: Colors.grey);
-                } else {
-                  return const Icon(Icons.flash_on, color: Colors.yellow);
-                }
-              },
-            ),
-            onPressed: () => controller.toggleTorch(),
+          // Correction Torch (Flash)
+          ValueListenableBuilder(
+            valueListenable: controller,
+            builder: (context, state, child) {
+              final torchState = state.torchState;
+              return IconButton(
+                icon: Icon(
+                  torchState == TorchState.on ? Icons.flash_on : Icons.flash_off,
+                  color: torchState == TorchState.on ? Colors.yellow : Colors.grey,
+                ),
+                onPressed: () => controller.toggleTorch(),
+              );
+            },
           ),
-          IconButton(
-            icon: Icon(
-              controller.isCameraFront
-                  ? Icons.camera_front
-                  : Icons.camera_rear,
-            ),
-            onPressed: () => controller.switchCamera(),
+          // Correction Switch Camera
+          ValueListenableBuilder(
+            valueListenable: controller,
+            builder: (context, state, child) {
+              return IconButton(
+                icon: Icon(
+                  state.facing == CameraFacing.front
+                      ? Icons.camera_front
+                      : Icons.camera_rear,
+                ),
+                onPressed: () => controller.switchCamera(),
+              );
+            },
           ),
         ],
       ),
@@ -60,7 +67,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
               }
             },
           ),
-          // Superposition pour guider le scan
           Center(
             child: Container(
               width: 250,
@@ -80,11 +86,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
     final vm = context.read<InventoryViewModel>();
     final product = await vm.findProduct(barcode);
 
+    if (!mounted) return;
+
     if (product != null) {
-      // Produit trouvé, on demande la quantité
       _showQuantityDialog(context, product);
     } else {
-      // Produit non trouvé
       _showProductNotFound(context, barcode);
     }
   }
@@ -100,8 +106,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
             product: product,
             quantity: quantity,
           );
-          Navigator.pop(context); // Fermer le dialogue
-          setState(() => isScanning = true); // Reprendre le scan
+          Navigator.pop(context);
+          setState(() => isScanning = true);
         },
         onCancel: () {
           Navigator.pop(context);
@@ -115,17 +121,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Produit non trouvé : $barcode"),
+        duration: const Duration(seconds: 2),
         action: SnackBarAction(
-          label: 'Ajouter',
+          label: 'OK',
           onPressed: () {
-            // Logique pour ajouter le produit manuellement
             setState(() => isScanning = true);
           },
         ),
       ),
     );
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) setState(() => isScanning = true);
+      if (mounted && !isScanning) setState(() => isScanning = true);
     });
   }
 

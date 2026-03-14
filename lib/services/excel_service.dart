@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import '../models/product.dart';
 import '../models/inventory_item.dart';
 
@@ -31,7 +30,6 @@ class ExcelService {
         if (val.contains('barcode') || val.contains('barre')) barIdx = i;
       }
 
-      // Par défaut si non trouvé
       codeIdx ??= 0;
       desIdx ??= 1;
       barIdx ??= 2;
@@ -74,38 +72,26 @@ class ExcelService {
     
     // Feuille 1 : Historique
     Sheet sheet1 = excel['Historique'];
-    sheet1.appendRow([CellValue.string('Code'), CellValue.string('Designation'), CellValue.string('Barcode'), CellValue.string('Quantite'), CellValue.string('Date')]);
+    sheet1.appendRow([
+      TextCellValue('Code'), 
+      TextCellValue('Designation'), 
+      TextCellValue('Barcode'), 
+      TextCellValue('Quantite'), 
+      TextCellValue('Date')
+    ]);
+
     for (var item in data['history'] as List<InventoryItem>) {
       sheet1.appendRow([
-        CellValue.string(item.productCode),
-        CellValue.string(item.designation),
-        CellValue.string(item.barcode),
-        CellValue.number(item.quantity),
-        CellValue.string(item.date.toIso8601String())
+        TextCellValue(item.productCode),
+        TextCellValue(item.designation),
+        TextCellValue(item.barcode),
+        IntCellValue(item.quantity),
+        TextCellValue(item.date.toIso8601String())
       ]);
     }
 
     // Feuille 2 : Totaux
     Sheet sheet2 = excel['Totaux'];
-    sheet2.appendRow([CellValue.string('Code'), CellValue.string('Designation'), CellValue.string('Barcode'), CellValue.string('Quantite Totale')]);
-    for (var row in data['totals'] as List<Map<String, dynamic>>) {
-      sheet2.appendRow([
-        CellValue.string(row['product_code']),
-        CellValue.string(row['designation']),
-        CellValue.string(row['barcode']),
-        CellValue.number(row['total_quantity'])
-      ]);
-    }
-
-    // Supprimer la feuille par défaut "Sheet1"
-    if (excel.tables.containsKey('Sheet1')) excel.delete('Sheet1');
-
-    var fileBytes = excel.save();
-    var directory = await getTemporaryDirectory();
-    String fileName = "${data['name']}_export.xlsx";
-    File file = File("${directory.path}/$fileName");
-    await file.writeAsBytes(fileBytes!);
-    
-    return file.path;
-  }
-}
+    sheet2.appendRow([
+      TextCellValue('Code'), 
+      TextCellValue('
