@@ -94,4 +94,29 @@ class ExcelService {
     Sheet sheet2 = excel['Totaux'];
     sheet2.appendRow([
       TextCellValue('Code'), 
-      TextCellValue('
+      TextCellValue('Designation'), 
+      TextCellValue('Barcode'), 
+      TextCellValue('Quantite Totale')
+    ]);
+
+    for (var row in data['totals'] as List<Map<String, dynamic>>) {
+      sheet2.appendRow([
+        TextCellValue(row['product_code']?.toString() ?? ''),
+        TextCellValue(row['designation']?.toString() ?? ''),
+        TextCellValue(row['barcode']?.toString() ?? ''),
+        // On gère le cas où la quantité pourrait être double ou int
+        IntCellValue(int.tryParse(row['total_quantity'].toString()) ?? 0)
+      ]);
+    }
+
+    if (excel.tables.containsKey('Sheet1')) excel.delete('Sheet1');
+
+    var fileBytes = excel.save();
+    var directory = await getTemporaryDirectory();
+    String fileName = "${data['name']}_export.xlsx";
+    File file = File("${directory.path}/$fileName");
+    await file.writeAsBytes(fileBytes!);
+    
+    return file.path;
+  }
+}
